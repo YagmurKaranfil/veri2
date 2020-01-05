@@ -1,0 +1,90 @@
+#include"stdafx.h"
+#include<iostream>
+#include<string>
+#include <ctime>
+#include<fstream>
+#define MAX 100
+int levenshtein(char[],char[],int,int);
+int MinimumBul(int,int,int);
+static int mesafe;
+using namespace std;
+string kelimeler[1000000];
+
+
+int levenshtein(char GK[], char KK[], int m, int n)
+{
+	int Matris[MAX][MAX];
+	for (int i = 0; i < m; i++)
+		Matris[i][0] = i;
+	for (int i = 0; i < n; i++)
+		Matris[0][i] = i;
+	for (int i = 1; i <= m; i++)
+	{
+		for (int j = 1; j <= n; j++)
+		{
+			if (GK[i - 1] == KK[j - 1])
+			{
+				Matris[i][j] = Matris[i - 1][j - 1];
+				mesafe = Matris[i][j];
+			}
+			else
+			{
+				Matris[i][j] = MinimumBul(Matris[i - 1][j] + 1, Matris[i][j - 1] + 1, Matris[i - 1][j - 1] + 1);
+				mesafe = Matris[i][j];
+			}
+		}
+	}
+	return mesafe;
+}
+int MinimumBul(int a, int b, int c)
+{
+	int minimum = a;
+	if (b <= minimum)
+		minimum = b;
+	if (c <= minimum)
+		minimum = c;
+	return minimum;
+}
+
+int main()
+{
+	int i=0;
+	ifstream DosyaOku("kelimeler.txt");
+	while (!(DosyaOku.eof())) //DosyaOku da belirttiğim Kelime.txt dosyasini sonuna kadar okuttum.
+		{
+			DosyaOku >> kelimeler[i];
+			i++;
+		}
+
+
+	static char GirilenKelime[MAX];
+	char KayitliKelime[MAX];
+	cout << "Kelime giriniz:\n";
+	cout << "\n";
+	cin.getline(GirilenKelime,MAX);
+	cout << "\n";
+	clock_t baslangic = clock(), bitis;
+	for (int i=0; i < MAX; i++)
+	{
+	GirilenKelime[i] = tolower(GirilenKelime[i]);
+	}
+	for(int i=0;i<1000000;i++)
+	{
+	char *KayitliKelime = (char*)kelimeler[i].c_str();
+	if (GirilenKelime==kelimeler[i])
+	{
+		cout << "Bunu mu demek istediniz?\n" << kelimeler[i] << "\n\n";
+		system("pause");
+	}
+	else
+	{
+	int mesafe = levenshtein(GirilenKelime, KayitliKelime, ((int)strlen(GirilenKelime)+1), ((int)strlen(KayitliKelime)+1));if((int)strlen(GirilenKelime)<=20 && mesafe<=1)
+	cout << "Bunu mu demek istediniz?\n\n" << kelimeler[i] << "\n\n";else if((int)strlen(GirilenKelime)>20 && mesafe <=5)
+	cout << "Bunu mu demek istediniz?\n" << kelimeler[i] << "\n\n";
+	}
+	
+	}
+	bitis = clock();
+	cout <<"Zaman : "<< (float)(bitis - baslangic) / CLOCKS_PER_SEC<<endl<<endl;
+system("pause");
+}
